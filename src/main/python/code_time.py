@@ -104,9 +104,11 @@ class CodeTime(object):
         else:
             header_string = "Date" + self.delimeter
             header_string += self.delimeter.join(list(self.meta_dict.keys()))
+            header_string += self.delimeter
             header_string += self.delimeter.join(list(self.time_dict.keys()))
             main_string = self.today + self.delimeter
             main_string += self.delimeter.join(list(self.meta_dict.values()))
+            main_string += self.delimeter
             float_str_l = ["{:.2f}".format(v) for v in self.time_dict.values()]
             main_string += self.delimeter.join(float_str_l)
             with open(self.filename, "w") as f:
