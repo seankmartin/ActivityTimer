@@ -28,3 +28,7 @@ Things I'd like to add, ordered by likelihood of completion.
 
 1. A viewer for the Activity Timer output, to see work done each day.
 2. Custom activities. Currently, changing the name of the activities would be little effort, but customising the number would be.
+
+## Licensing
+
+This project is licensed under the MIT license.
