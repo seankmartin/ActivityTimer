@@ -6,6 +6,7 @@ from fbs_runtime.application_context.PyQt5 import ApplicationContext
 from PyQt5 import uic
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtCore import QTimer
+import pkg_resources.py2_warn
 
 from code_time import CodeTime, strfdelta
 

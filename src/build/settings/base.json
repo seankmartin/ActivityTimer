@@ -1,5 +1,5 @@
 {
-  "app_name": "Activity Timer",
+  "app_name": "ActivityTimer",
   "author": "Sean Martin",
   "main_module": "src/main/python/main.py",
   "version": "1.0.0"
