@@ -118,18 +118,56 @@ class CodeTime(object):
         with open(self.default_loc, "w") as f:
             f.write(self.filename)
 
+    def to_nice_format(self):
+        import math
+
+        def change_function(x):
+            if isinstance(x, float):
+                if math.isnan(x):
+                    return ""
+                out_time = x
+                dt = datetime.timedelta(seconds=out_time)
+                return strfdelta(dt, "{hours} hours, {minutes} minutes")
+            else:
+                if "Summary: " in x:
+                    x = x[len("Summary: "):]
+                elif "Objective: " in x:
+                    x = x[len("Objective: "):]
+                elif "Summary:" in x:
+                    x = x[len("Summary:"):]
+                elif "Objective:" in x:
+                    x = x[len("Objective:"):]
+                return x
+
+        def row_total(row):
+            total = 0
+            for k in self.time_dict.keys():
+                total += row[k]
+            return total
+
+        df = pd.read_csv(self.filename, sep=self.delimeter)
+        # Add a total row
+        df['Total'] = df.apply(row_total, axis=1)
+        df.loc['inf'] = df.mean()
+        df.at['inf', "Date"] = "Average"
+
+        out_fname = os.path.splitext(self.filename)[0] + "_fancy" + ".xlsx"
+        df = df.applymap(change_function)
+        df.to_excel(out_fname, index=False, freeze_panes=(1, 1))
+
 
 if __name__ == "__main__":
-    main_fname = r"E:\Repos\privateCode\CodeTime\test.csv"
-    main_default_loc = r"E:\Repos\privateCode\CodeTime\def.txt"
+    main_fname = r"E:\Google_Drive\PhD\Admin\timing.csv"
+    main_default_loc = r"C:\Users\Sean\.code_time_skm\default.txt"
     ct = CodeTime(default_loc=main_default_loc)
-    ct.set_selected("Coding")
+    ct.to_nice_format()
+    # ct.set_selected("Coding")
 
-    start_time = time.monotonic()
-    m_elapsed_time = 0.10
-    while (time.monotonic() - start_time) < 1.0:
-        time.sleep(m_elapsed_time)
-        ct.update(m_elapsed_time)
+    # start_time = time.monotonic()
+    # m_elapsed_time = 0.10
+    # while (time.monotonic() - start_time) < 1.0:
+    #     time.sleep(m_elapsed_time)
+    #     ct.update(m_elapsed_time)
 
-    ct.stop()
-    ct.save_to_file()
+    # ct.stop()
+    # ct.save_to_file()
