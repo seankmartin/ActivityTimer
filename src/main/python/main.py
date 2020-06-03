@@ -7,6 +7,7 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtCore import QTimer
 import pkg_resources.py2_warn
+import openpyxl
 
 from code_time import CodeTime, strfdelta
 
@@ -39,6 +40,8 @@ class CodeTimeUI(DesignerUI):
         self.linkNames()
         self.setup()
         self.update_times()
+        self.selected_text.setText("Select a timer")
+        self.time_text.setText("Time will appear here...")
         self.autosave_timer.start(self.save_frequency)
 
     def init_vars(self):
@@ -108,8 +111,6 @@ class CodeTimeUI(DesignerUI):
         self.write_button.clicked.connect(self.write_hit)
 
         self.date_text.setText(self.code_time.today)
-        self.selected_text.setText("Select a timer")
-        self.time_text.setText("Time will appear here...")
         self.objective_edit.setPlainText(self.code_time.meta_dict["Objective"])
         self.summary_edit.setPlainText(self.code_time.meta_dict["Summary"])
 
@@ -178,8 +179,15 @@ class CodeTimeUI(DesignerUI):
         self.code_time.set_objective(self.objective_edit.toPlainText())
         self.code_time.set_summary(self.summary_edit.toPlainText())
         self.code_time.save_to_file()
-        self.info_text.setText("Successfully saved to {}".format(
-            self.code_time.filename))
+        text = "Successfully saved to {}".format(self.code_time.filename)
+        try:
+            self.code_time.to_nice_format()
+        except PermissionError:
+            out_name_xls = os.path.splitext(
+                self.code_time.filename)[0] + "_fancy" + ".xlsx"
+            text = "ERROR: Please close Excel sheet open at {}".format(
+                out_name_xls)
+        self.info_text.setText(text)
 
     def save_quit(self):
         self.save()
