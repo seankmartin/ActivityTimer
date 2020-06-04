@@ -52,6 +52,14 @@ class CodeTime(object):
         return strfdelta(
             dt, "{hours} hours, {minutes} minutes, {seconds} seconds")
 
+    def get_total_time(self):
+        out_time = 0.00
+        for time_val in self.time_dict.values():
+            out_time += time_val
+        dt = datetime.timedelta(seconds=out_time)
+        return strfdelta(
+            dt, "{hours} hours, {minutes} minutes, {seconds} seconds")
+
     def populate(self, in_fname=None):
         if self.default_loc is not None:
             if os.path.isfile(self.default_loc):

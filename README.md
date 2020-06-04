@@ -18,7 +18,7 @@ A windows download is also available at https://github.com/seankmartin/ActivityT
 
 - Time activities each day and provide an objective and summary.
 - Produce a clean excel file for human viewing and a csv for machine use from the times recorded.
-- Demonstrates the use of the fbs build system, Pyqt5 timers and file dialogs, auto-saving every 2 minutes.
+- Demonstrates the use of the fbs build system, Pyqt5 timers and file dialogs, auto-saving every 20 minutes.
 
 ## User interface
 

@@ -40,17 +40,16 @@ class CodeTimeUI(DesignerUI):
         self.linkNames()
         self.setup()
         self.update_times()
-        self.selected_text.setText("Select a timer")
-        self.time_text.setText("Time will appear here...")
         self.autosave_timer.start(self.save_frequency)
 
     def init_vars(self):
         self.selected_file = None
         self.should_update = False
-        self.update_frequency_secs = 0.20
+        self.update_frequency_secs = 1.00
         # Convert to msec for qt timer
         self.update_frequency = int(self.update_frequency_secs * 1000)
-        self.save_frequency = int(1000 * 120)
+        save_freq_mins = 20
+        self.save_frequency = int(1000 * 60 * save_freq_mins)
 
     def linkNames(self):
         self.file_select_button = self.ui.OpenButton
@@ -95,7 +94,7 @@ class CodeTimeUI(DesignerUI):
         self.selected_file = self.code_time.filename
 
         if self.code_time.filename is not None:
-            self.file_select_text.setText(self.code_time.filename)
+            self.file_select_text.setText("Saving to " + self.code_time.filename)
         else:
             self.file_select_text.setText("Please select a file...")
 
@@ -110,9 +109,10 @@ class CodeTimeUI(DesignerUI):
         self.read_button.clicked.connect(self.read_hit)
         self.write_button.clicked.connect(self.write_hit)
 
-        self.date_text.setText(self.code_time.today)
+        self.date_text.setText("Today is " + self.code_time.today)
         self.objective_edit.setPlainText(self.code_time.meta_dict["Objective"])
         self.summary_edit.setPlainText(self.code_time.meta_dict["Summary"])
+        self.selected_text.setText("Select a timer to start timing")
 
         if self.selected_file is None:
             self.info_text.setText("No file selected, please select one")
@@ -129,7 +129,7 @@ class CodeTimeUI(DesignerUI):
         self.selected_file, _filter = self.file_dialog.getSaveFileName(
             self.window, "Save Output Times", os.path.expanduser("~"),
             "CSV (*.csv)")
-        self.file_select_text.setText(self.selected_file)
+        self.file_select_text.setText("Saving to " + self.selected_file)
         self.info_text.setText("Will save to {}".format(self.selected_file))
         try:
             self.code_time.set_file(self.selected_file)
@@ -159,13 +159,11 @@ class CodeTimeUI(DesignerUI):
         else:
             self.code_time.set_selected(button_type)
             self.selected_text.setText("Timing " + button_type)
-            self.time_text.setText(self.code_time.get_time())
             self.timer.start(self.update_frequency)
 
     def stop(self):
         self.timer.stop()
-        self.selected_text.setText("Select a timer")
-        self.time_text.setText("Time will appear here...")
+        self.selected_text.setText("Timer paused")
         self.code_time.set_selected(None)
 
     def autosave(self):
@@ -179,7 +177,9 @@ class CodeTimeUI(DesignerUI):
         self.code_time.set_objective(self.objective_edit.toPlainText())
         self.code_time.set_summary(self.summary_edit.toPlainText())
         self.code_time.save_to_file()
-        text = "Successfully saved to {}".format(self.code_time.filename)
+        text = "Successfully saved to {} at {}".format(
+            self.code_time.filename,
+            datetime.datetime.now().strftime("%H:%M:%S"))
         try:
             self.code_time.to_nice_format()
         except PermissionError:
@@ -199,7 +199,7 @@ class CodeTimeUI(DesignerUI):
             self.time_dict[key].setText(
                 strfdelta(
                     dt, "{hours} hours, {minutes} minutes, {seconds} seconds"))
-        self.time_text.setText(self.code_time.get_time())
+        self.time_text.setText("Total today " + self.code_time.get_total_time())
 
     def on_update_timer(self):
         self.code_time.update(self.update_frequency_secs)
