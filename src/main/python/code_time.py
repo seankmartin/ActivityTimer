@@ -76,6 +76,9 @@ class CodeTime(object):
         if self.selected is not None:
             self.time_dict[self.selected] += elapsed_time
 
+    def add_time_mins(self, key, elapsed_time_mins):
+        self.time_dict[key] += elapsed_time_mins * 60
+
     def load_file(self):
         with open(self.filename, "r") as f:
             df = pd.read_csv(f, sep=self.delimeter)
@@ -164,11 +167,81 @@ class CodeTime(object):
         df.to_excel(out_fname, index=False, freeze_panes=(1, 1))
 
 
+def main():
+    import argparse
+
+    all_keys = [
+        "Coding", "Reading", "Writing", "Contact", "Misc", "Objective", "Summary"]
+    parser = argparse.ArgumentParser(description="Process modifiable arguments")
+    parser.add_argument(
+        "--key", "-k", type=str, required=True,
+        choices=all_keys,
+        help="The key to update")
+    parser.add_argument(
+        "--update", "-u", type=float, default=0,
+        help="The time to add in minutes")
+    parser.add_argument(
+        "--set", "-s", type=float, default=1000,
+        help="The time to set in minutes")
+    parser.add_argument(
+        "--text", "-t", type=str, default="",
+        help="The text to set on metadata keys")
+    args = parser.parse_args()
+
+    home = os.path.expanduser("~")
+    default_loc = os.path.join(home, ".code_time_skm", "default.txt")
+    os.makedirs(os.path.dirname(default_loc), exist_ok=True)
+    code_time = CodeTime(default_loc=default_loc)
+    print("Loaded from {}".format(code_time.filename))
+
+    changed = False
+    if args.key in code_time.time_dict.keys():
+        changed = True
+        if args.update != 0:
+            code_time.add_time_mins(args.key, args.update)
+        elif args.set != 1000:
+            code_time.time_dict[args.key] = args.set
+    elif args.key in code_time.meta_dict.keys():
+        changed = True
+        if args.text != "":
+            code_time.meta_dict[args.key] = args.text
+    else:
+        raise ValueError("Unknown key {}, valid keys are {} or {}".format(
+            args.key,
+            list(code_time.time_dict.keys()),
+            list(code_time.meta_dict.keys())))
+
+    if changed:
+        print("----------The stats for today are now----------")
+        print("Objective: {}".format(code_time.meta_dict["Objective"]))
+        print("Summary: {}".format(code_time.meta_dict["Summary"]))
+        for key, val in code_time.time_dict.items():
+            dt = datetime.timedelta(seconds=val)
+            fmt_date = strfdelta(dt, "{hours} hours, {minutes} minutes")
+            print("{}: {}".format(key, fmt_date))
+
+        ok = ""
+        while (ok != "y") and (ok != "n"):
+            ok = input("Would you like to save this change? (y/n):\n")
+            ok = ok.strip().lower()
+            if (ok != "y") and (ok != "n"):
+                print("Unknown option: {}".format(ok))
+
+        if ok == "y":
+            code_time.save_to_file()
+            print("Successfully saved to {}".format(code_time.filename))
+            out_name_xls = os.path.splitext(
+                code_time.filename)[0] + "_fancy" + ".xlsx"
+            code_time.to_nice_format()
+            print("Successfully saved to {}".format(out_name_xls))
+
+
 if __name__ == "__main__":
-    main_fname = r"E:\Google_Drive\PhD\Admin\timing.csv"
-    main_default_loc = r"C:\Users\Sean\.code_time_skm\default.txt"
-    ct = CodeTime(default_loc=main_default_loc)
-    ct.to_nice_format()
+    main()
+    # main_fname = r"E:\Google_Drive\PhD\Admin\timing.csv"
+    # main_default_loc = r"C:\Users\Sean\.code_time_skm\default.txt"
+    # ct = CodeTime(default_loc=main_default_loc)
+    # ct.to_nice_format()
     # ct.set_selected("Coding")
 
     # start_time = time.monotonic()
