@@ -15,7 +15,7 @@ def strfdelta(tdelta, fmt):
 
 class CodeTime(object):
 
-    def __init__(self, keys=None, default_loc=None):
+    def __init__(self, keys=None, default_loc=None, days=0):
         if keys is None:
             keys = ["Coding", "Reading", "Writing", "Contact", "Misc"]
         self.time_dict = {}
@@ -23,7 +23,9 @@ class CodeTime(object):
             self.time_dict[k] = 0.0
         self.meta_dict = {"Objective": "Objective:", "Summary": "Summary:"}
         self.selected = None
-        self.today = datetime.datetime.today().strftime("%d/%m/%Y")
+        self.today = (
+            datetime.datetime.today() - datetime.timedelta(days=days)
+        ).strftime("%d/%m/%Y")
         self.filename = None
         self.default_loc = default_loc
         self.delimeter = "|"
@@ -172,7 +174,8 @@ def main():
 
     all_keys = [
         "Coding", "Reading", "Writing", "Contact", "Misc", "Objective", "Summary"]
-    parser = argparse.ArgumentParser(description="Process modifiable arguments")
+    parser = argparse.ArgumentParser(
+        description="Process modifiable arguments")
     parser.add_argument(
         "--key", "-k", type=str, required=True,
         choices=all_keys,
@@ -186,13 +189,31 @@ def main():
     parser.add_argument(
         "--text", "-t", type=str, default="",
         help="The text to set on metadata keys")
+    parser.add_argument(
+        "--days", "-d", type=int, default=0,
+        help="The number of days back from today to modify")
+    parser.add_argument(
+        "--backup", "-b", action="store_true",
+        help="Backup the time file before execution")
     args = parser.parse_args()
 
     home = os.path.expanduser("~")
     default_loc = os.path.join(home, ".code_time_skm", "default.txt")
     os.makedirs(os.path.dirname(default_loc), exist_ok=True)
-    code_time = CodeTime(default_loc=default_loc)
+    code_time = CodeTime(default_loc=default_loc, days=args.days)
     print("Loaded from {}".format(code_time.filename))
+
+    if args.backup == True:
+        orig = code_time.filename
+        split = os.path.splitext(code_time.filename)
+        backup_loc = split[0] + "_backup" + split[1]
+        print("Backing up to {}".format(backup_loc))
+        code_time.set_file(backup_loc)
+        code_time.save_to_file()
+        code_time.to_nice_format()
+        code_time.set_file(orig)
+        with open(code_time.default_loc, "w") as f:
+            f.write(code_time.filename)
 
     changed = False
     if args.key in code_time.time_dict.keys():
@@ -212,9 +233,21 @@ def main():
             list(code_time.meta_dict.keys())))
 
     if changed:
-        print("----------The stats for today are now----------")
-        print("Objective: {}".format(code_time.meta_dict["Objective"]))
-        print("Summary: {}".format(code_time.meta_dict["Summary"]))
+        print("-----The stats for {} are now-----".format(code_time.today))
+
+        def mod_x(x):
+            if "Summary: " in x:
+                x = x[len("Summary: "):]
+            elif "Objective: " in x:
+                x = x[len("Objective: "):]
+            elif "Summary:" in x:
+                x = x[len("Summary:"):]
+            elif "Objective:" in x:
+                x = x[len("Objective:"):]
+            return x
+
+        print("Objective: {}".format(mod_x(code_time.meta_dict["Objective"])))
+        print("Summary: {}".format(mod_x(code_time.meta_dict["Summary"])))
         for key, val in code_time.time_dict.items():
             dt = datetime.timedelta(seconds=val)
             fmt_date = strfdelta(dt, "{hours} hours, {minutes} minutes")
