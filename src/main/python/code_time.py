@@ -2,6 +2,7 @@
 import datetime
 import time
 import os
+import shutil
 
 import pandas as pd
 
@@ -204,16 +205,10 @@ def main():
     print("Loaded from {}".format(code_time.filename))
 
     if args.backup == True:
-        orig = code_time.filename
         split = os.path.splitext(code_time.filename)
         backup_loc = split[0] + "_backup" + split[1]
         print("Backing up to {}".format(backup_loc))
-        code_time.set_file(backup_loc)
-        code_time.save_to_file()
-        code_time.to_nice_format()
-        code_time.set_file(orig)
-        with open(code_time.default_loc, "w") as f:
-            f.write(code_time.filename)
+        shutil.copy(code_time.filename, backup_loc)
 
     changed = False
     if args.key in code_time.time_dict.keys():
