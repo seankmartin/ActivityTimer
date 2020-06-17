@@ -47,7 +47,6 @@ Things I'd like to add, ordered by likelihood of completion.
 
 1. Custom activities. Currently, changing the name of the activities would be little effort, but customising the number would be.
 2. Add a minimise button to the UI and support rescaling the UI.
-3. Fix a bug with the top time bar not updating sometimes. This causes no problems in the backend, so it is not a priority fix. The time bar for each individual item still updates properly.
 
 ## Licensing
 
