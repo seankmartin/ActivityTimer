@@ -3,6 +3,7 @@ import datetime
 import time
 import os
 import shutil
+from copy import deepcopy
 
 import pandas as pd
 
@@ -104,7 +105,7 @@ class CodeTime(object):
             df = pd.read_csv(self.filename, sep=self.delimeter)
             this_row = df.index[df["Date"] == self.today]
             if len(this_row) == 0:
-                dict_to_append = self.time_dict
+                dict_to_append = deepcopy(self.time_dict)
                 dict_to_append.update(self.meta_dict)
                 dict_to_append["Date"] = self.today
                 df = df.append(dict_to_append, ignore_index=True)
@@ -156,6 +157,9 @@ class CodeTime(object):
         def row_total(row):
             total = 0
             for k in self.time_dict.keys():
+                if isinstance(row[k], str):
+                    print(row[k])
+                    print(k)
                 total += row[k]
             return total
 
@@ -168,7 +172,6 @@ class CodeTime(object):
         out_fname = os.path.splitext(self.filename)[0] + "_fancy" + ".xlsx"
         df = df.applymap(change_function)
         df.to_excel(out_fname, index=False, freeze_panes=(1, 1))
-
 
 def main():
     import argparse
@@ -269,7 +272,6 @@ if __name__ == "__main__":
     # main_fname = r"E:\Google_Drive\PhD\Admin\timing.csv"
     # main_default_loc = r"C:\Users\Sean\.code_time_skm\default.txt"
     # ct = CodeTime(default_loc=main_default_loc)
-    # ct.to_nice_format()
     # ct.set_selected("Coding")
 
     # start_time = time.monotonic()
@@ -277,6 +279,9 @@ if __name__ == "__main__":
     # while (time.monotonic() - start_time) < 1.0:
     #     time.sleep(m_elapsed_time)
     #     ct.update(m_elapsed_time)
+    # print(ct.time_dict)
 
     # ct.stop()
     # ct.save_to_file()
+    # print(ct.time_dict)
+    # ct.to_nice_format()
