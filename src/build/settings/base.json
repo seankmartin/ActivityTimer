@@ -1,5 +1,5 @@
 {
-  "app_name": "ActivityTimer",
+  "app_name": "LifeTimer",
   "author": "Sean Martin",
   "main_module": "src/main/python/main.py",
   "version": "1.0.0"

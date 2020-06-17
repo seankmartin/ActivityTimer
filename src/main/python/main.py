@@ -70,11 +70,11 @@ class CodeTimeUI(DesignerUI):
         self.write_text = self.ui.WritingTimeLine
 
         self.time_dict = {
-            "Coding": self.code_text,
-            "Contact": self.contact_text,
-            "Misc": self.misc_text,
-            "Reading": self.read_text,
-            "Writing": self.write_text,
+            "Gaming": self.code_text,
+            "Piano": self.read_text,
+            "Sleep": self.write_text,
+            "Exercise": self.contact_text,
+            "Dev": self.misc_text,
         }
 
         self.info_text = self.ui.InfoText
@@ -88,7 +88,7 @@ class CodeTimeUI(DesignerUI):
 
     def setup(self):
         home = os.path.expanduser("~")
-        default_loc = os.path.join(home, ".code_time_skm", "default.txt")
+        default_loc = os.path.join(home, ".code_time_skm", "default_life.txt")
         os.makedirs(os.path.dirname(default_loc), exist_ok=True)
         self.code_time = CodeTime(default_loc=default_loc)
         self.selected_file = self.code_time.filename
@@ -110,7 +110,7 @@ class CodeTimeUI(DesignerUI):
         self.write_button.clicked.connect(self.write_hit)
 
         self.date_text.setText("Today is " + self.code_time.today)
-        self.objective_edit.setPlainText(self.code_time.meta_dict["Objective"])
+        self.objective_edit.setPlainText(self.code_time.meta_dict["Misc"])
         self.summary_edit.setPlainText(self.code_time.meta_dict["Summary"])
         self.selected_text.setText("Select a timer to start timing")
 
@@ -138,19 +138,20 @@ class CodeTimeUI(DesignerUI):
             return
 
     def coding_hit(self):
-        self.time_button_hit("Coding")
-
-    def contact_hit(self):
-        self.time_button_hit("Contact")
-
-    def misc_hit(self):
-        self.time_button_hit("Misc")
+        self.time_button_hit("Gaming")
 
     def read_hit(self):
-        self.time_button_hit("Reading")
+        self.time_button_hit("Piano")
 
     def write_hit(self):
-        self.time_button_hit("Writing")
+        self.time_button_hit("Sleep")
+
+    def contact_hit(self):
+        self.time_button_hit("Exercise")
+
+    def misc_hit(self):
+        self.time_button_hit("Dev")
+
 
     def time_button_hit(self, button_type):
         if self.code_time.selected == button_type:

@@ -18,11 +18,11 @@ def strfdelta(tdelta, fmt):
 class CodeTime(object):
     def __init__(self, keys=None, default_loc=None, days=0):
         if keys is None:
-            keys = ["Coding", "Reading", "Writing", "Contact", "Misc"]
+            keys = ["Gaming", "Piano", "Sleep", "Exercise", "Dev"]
         self.time_dict = {}
         for k in keys:
             self.time_dict[k] = 0.0
-        self.meta_dict = {"Objective": "Objective:", "Summary": "Summary:"}
+        self.meta_dict = {"Misc": "Misc:", "Summary": "Summary:"}
         self.selected = None
         self.today = (
             datetime.datetime.today() - datetime.timedelta(days=days)
@@ -42,7 +42,7 @@ class CodeTime(object):
         self.selected = selected
 
     def set_objective(self, objective):
-        self.meta_dict["Objective"] = objective
+        self.meta_dict["Misc"] = objective
 
     def set_summary(self, summary):
         self.meta_dict["Summary"] = summary
@@ -81,6 +81,9 @@ class CodeTime(object):
         self.time_dict[key] += elapsed_time_mins * 60
 
     def load_file(self):
+        if not os.path.isfile(self.filename):
+            return
+
         with open(self.filename, "r") as f:
             df = pd.read_csv(f, sep=self.delimeter)
             this_row = df[df["Date"] == self.today]
@@ -143,20 +146,17 @@ class CodeTime(object):
             else:
                 if "Summary: " in x:
                     x = x[len("Summary: ") :]
-                elif "Objective: " in x:
-                    x = x[len("Objective: ") :]
+                elif "Misc: " in x:
+                    x = x[len("Misc: ") :]
                 elif "Summary:" in x:
                     x = x[len("Summary:") :]
-                elif "Objective:" in x:
-                    x = x[len("Objective:") :]
+                elif "Misc:" in x:
+                    x = x[len("Misc:") :]
                 return x
 
         def row_total(row):
             total = 0
             for k in self.time_dict.keys():
-                if isinstance(row[k], str):
-                    print(row[k])
-                    print(k)
                 total += row[k]
             return total
 
@@ -175,12 +175,12 @@ def main():
     import argparse
 
     all_keys = [
-        "Coding",
-        "Reading",
-        "Writing",
-        "Contact",
+        "Gaming",
+        "Piano",
+        "Sleep",
+        "Exercise",
+        "Dev",
         "Misc",
-        "Objective",
         "Summary",
     ]
     parser = argparse.ArgumentParser(description="Process modifiable arguments")
@@ -217,7 +217,7 @@ def main():
     args = parser.parse_args()
 
     home = os.path.expanduser("~")
-    default_loc = os.path.join(home, ".code_time_skm", "default.txt")
+    default_loc = os.path.join(home, ".code_time_skm", "default_life.txt")
     os.makedirs(os.path.dirname(default_loc), exist_ok=True)
     code_time = CodeTime(default_loc=default_loc, days=args.days)
     print("Loaded from {}".format(code_time.filename))
@@ -254,15 +254,15 @@ def main():
         def mod_x(x):
             if "Summary: " in x:
                 x = x[len("Summary: ") :]
-            elif "Objective: " in x:
-                x = x[len("Objective: ") :]
+            elif "Misc: " in x:
+                x = x[len("Misc: ") :]
             elif "Summary:" in x:
-                x = x[len("Summary:") :]
-            elif "Objective:" in x:
-                x = x[len("Objective:") :]
+                x = x[len("Misc:") :]
+            elif "Misc:" in x:
+                x = x[len("Misc:") :]
             return x
 
-        print("Objective: {}".format(mod_x(code_time.meta_dict["Objective"])))
+        print("Misc: {}".format(mod_x(code_time.meta_dict["Misc"])))
         print("Summary: {}".format(mod_x(code_time.meta_dict["Summary"])))
         for key, val in code_time.time_dict.items():
             dt = datetime.timedelta(seconds=val)

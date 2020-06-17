@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Activity Timer</string>
+   <string>Life Timer</string>
   </property>
   <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
@@ -85,7 +85,7 @@
     <item row="0" column="0">
      <widget class="QPushButton" name="CodeButton">
       <property name="text">
-       <string>Coding</string>
+       <string>Gaming</string>
       </property>
      </widget>
     </item>
@@ -95,7 +95,7 @@
     <item row="1" column="0">
      <widget class="QPushButton" name="ReadButton">
       <property name="text">
-       <string>Reading</string>
+       <string>Piano</string>
       </property>
      </widget>
     </item>
@@ -105,7 +105,7 @@
     <item row="2" column="0">
      <widget class="QPushButton" name="WriteButton">
       <property name="text">
-       <string>Writing</string>
+       <string>Sleep</string>
       </property>
      </widget>
     </item>
@@ -115,7 +115,7 @@
     <item row="3" column="0">
      <widget class="QPushButton" name="ContactButton">
       <property name="text">
-       <string>Contact</string>
+       <string>Exercise</string>
       </property>
      </widget>
     </item>
@@ -125,7 +125,7 @@
     <item row="4" column="0">
      <widget class="QPushButton" name="MiscButton">
       <property name="text">
-       <string>Misc</string>
+       <string>Dev</string>
       </property>
      </widget>
     </item>
