@@ -152,7 +152,6 @@ class CodeTimeUI(DesignerUI):
     def misc_hit(self):
         self.time_button_hit("Dev")
 
-
     def time_button_hit(self, button_type):
         if self.code_time.selected == button_type:
             self.stop()
