@@ -81,6 +81,9 @@ class CodeTime(object):
         self.time_dict[key] += elapsed_time_mins * 60
 
     def load_file(self):
+        if not os.path.isfile(self.filename):
+            return
+
         with open(self.filename, "r") as f:
             df = pd.read_csv(f, sep=self.delimeter)
             this_row = df[df["Date"] == self.today]
@@ -154,9 +157,6 @@ class CodeTime(object):
         def row_total(row):
             total = 0
             for k in self.time_dict.keys():
-                if isinstance(row[k], str):
-                    print(row[k])
-                    print(k)
                 total += row[k]
             return total
 
