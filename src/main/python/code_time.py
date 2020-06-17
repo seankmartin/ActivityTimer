@@ -16,7 +16,6 @@ def strfdelta(tdelta, fmt):
 
 
 class CodeTime(object):
-
     def __init__(self, keys=None, default_loc=None, days=0):
         if keys is None:
             keys = ["Coding", "Reading", "Writing", "Contact", "Misc"]
@@ -53,16 +52,14 @@ class CodeTime(object):
         if self.selected is not None:
             out_time = self.time_dict[self.selected]
         dt = datetime.timedelta(seconds=out_time)
-        return strfdelta(
-            dt, "{hours} hours, {minutes} minutes, {seconds} seconds")
+        return strfdelta(dt, "{hours} hours, {minutes} minutes, {seconds} seconds")
 
     def get_total_time(self):
         out_time = 0.00
         for time_val in self.time_dict.values():
             out_time += time_val
         dt = datetime.timedelta(seconds=out_time)
-        return strfdelta(
-            dt, "{hours} hours, {minutes} minutes, {seconds} seconds")
+        return strfdelta(dt, "{hours} hours, {minutes} minutes, {seconds} seconds")
 
     def populate(self, in_fname=None):
         if self.default_loc is not None:
@@ -145,13 +142,13 @@ class CodeTime(object):
                 return strfdelta(dt, "{hours} hours, {minutes} minutes")
             else:
                 if "Summary: " in x:
-                    x = x[len("Summary: "):]
+                    x = x[len("Summary: ") :]
                 elif "Objective: " in x:
-                    x = x[len("Objective: "):]
+                    x = x[len("Objective: ") :]
                 elif "Summary:" in x:
-                    x = x[len("Summary:"):]
+                    x = x[len("Summary:") :]
                 elif "Objective:" in x:
-                    x = x[len("Objective:"):]
+                    x = x[len("Objective:") :]
                 return x
 
         def row_total(row):
@@ -165,40 +162,58 @@ class CodeTime(object):
 
         df = pd.read_csv(self.filename, sep=self.delimeter)
         # Add a total row
-        df['Total'] = df.apply(row_total, axis=1)
-        df.loc['inf'] = df.mean()
-        df.at['inf', "Date"] = "Average"
+        df["Total"] = df.apply(row_total, axis=1)
+        df.loc["inf"] = df.mean()
+        df.at["inf", "Date"] = "Average"
 
         out_fname = os.path.splitext(self.filename)[0] + "_fancy" + ".xlsx"
         df = df.applymap(change_function)
         df.to_excel(out_fname, index=False, freeze_panes=(1, 1))
 
+
 def main():
     import argparse
 
     all_keys = [
-        "Coding", "Reading", "Writing", "Contact", "Misc", "Objective", "Summary"]
-    parser = argparse.ArgumentParser(
-        description="Process modifiable arguments")
+        "Coding",
+        "Reading",
+        "Writing",
+        "Contact",
+        "Misc",
+        "Objective",
+        "Summary",
+    ]
+    parser = argparse.ArgumentParser(description="Process modifiable arguments")
     parser.add_argument(
-        "--key", "-k", type=str, required=True,
+        "--key",
+        "-k",
+        type=str,
+        required=True,
         choices=all_keys,
-        help="The key to update")
+        help="The key to update",
+    )
     parser.add_argument(
-        "--update", "-u", type=float, default=0,
-        help="The time to add in minutes")
+        "--update", "-u", type=float, default=0, help="The time to add in minutes"
+    )
     parser.add_argument(
-        "--set", "-s", type=float, default=1000,
-        help="The time to set in minutes")
+        "--set", "-s", type=float, default=1000, help="The time to set in minutes"
+    )
     parser.add_argument(
-        "--text", "-t", type=str, default="",
-        help="The text to set on metadata keys")
+        "--text", "-t", type=str, default="", help="The text to set on metadata keys"
+    )
     parser.add_argument(
-        "--days", "-d", type=int, default=0,
-        help="The number of days back from today to modify")
+        "--days",
+        "-d",
+        type=int,
+        default=0,
+        help="The number of days back from today to modify",
+    )
     parser.add_argument(
-        "--backup", "-b", action="store_true",
-        help="Backup the time file before execution")
+        "--backup",
+        "-b",
+        action="store_true",
+        help="Backup the time file before execution",
+    )
     args = parser.parse_args()
 
     home = os.path.expanduser("~")
@@ -225,23 +240,26 @@ def main():
         if args.text != "":
             code_time.meta_dict[args.key] = args.text
     else:
-        raise ValueError("Unknown key {}, valid keys are {} or {}".format(
-            args.key,
-            list(code_time.time_dict.keys()),
-            list(code_time.meta_dict.keys())))
+        raise ValueError(
+            "Unknown key {}, valid keys are {} or {}".format(
+                args.key,
+                list(code_time.time_dict.keys()),
+                list(code_time.meta_dict.keys()),
+            )
+        )
 
     if changed:
         print("-----The stats for {} are now-----".format(code_time.today))
 
         def mod_x(x):
             if "Summary: " in x:
-                x = x[len("Summary: "):]
+                x = x[len("Summary: ") :]
             elif "Objective: " in x:
-                x = x[len("Objective: "):]
+                x = x[len("Objective: ") :]
             elif "Summary:" in x:
-                x = x[len("Summary:"):]
+                x = x[len("Summary:") :]
             elif "Objective:" in x:
-                x = x[len("Objective:"):]
+                x = x[len("Objective:") :]
             return x
 
         print("Objective: {}".format(mod_x(code_time.meta_dict["Objective"])))
@@ -261,8 +279,7 @@ def main():
         if ok == "y":
             code_time.save_to_file()
             print("Successfully saved to {}".format(code_time.filename))
-            out_name_xls = os.path.splitext(
-                code_time.filename)[0] + "_fancy" + ".xlsx"
+            out_name_xls = os.path.splitext(code_time.filename)[0] + "_fancy" + ".xlsx"
             code_time.to_nice_format()
             print("Successfully saved to {}".format(out_name_xls))
 

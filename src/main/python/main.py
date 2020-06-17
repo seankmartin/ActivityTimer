@@ -74,7 +74,7 @@ class CodeTimeUI(DesignerUI):
             "Contact": self.contact_text,
             "Misc": self.misc_text,
             "Reading": self.read_text,
-            "Writing": self.write_text
+            "Writing": self.write_text,
         }
 
         self.info_text = self.ui.InfoText
@@ -117,8 +117,7 @@ class CodeTimeUI(DesignerUI):
         if self.selected_file is None:
             self.info_text.setText("No file selected, please select one")
         else:
-            self.info_text.setText(
-                "Selected {}".format(self.code_time.filename))
+            self.info_text.setText("Selected {}".format(self.code_time.filename))
 
         self.timer = QTimer(self.window)
         self.timer.timeout.connect(self.on_update_timer)
@@ -127,8 +126,8 @@ class CodeTimeUI(DesignerUI):
 
     def selectFile(self):
         self.selected_file, _filter = self.file_dialog.getSaveFileName(
-            self.window, "Save Output Times", os.path.expanduser("~"),
-            "CSV (*.csv)")
+            self.window, "Save Output Times", os.path.expanduser("~"), "CSV (*.csv)"
+        )
         self.file_select_text.setText("Saving to " + self.selected_file)
         self.info_text.setText("Will save to {}".format(self.selected_file))
         try:
@@ -169,24 +168,27 @@ class CodeTimeUI(DesignerUI):
     def autosave(self):
         if self.code_time.filename is not None:
             self.code_time.save_to_file()
-            self.info_text.setText("Successfully autosaved to {} at {}".format(
-                self.code_time.filename,
-                datetime.datetime.now().strftime("%H:%M:%S")))
+            self.info_text.setText(
+                "Successfully autosaved to {} at {}".format(
+                    self.code_time.filename,
+                    datetime.datetime.now().strftime("%H:%M:%S"),
+                )
+            )
 
     def save(self):
         self.code_time.set_objective(self.objective_edit.toPlainText())
         self.code_time.set_summary(self.summary_edit.toPlainText())
         self.code_time.save_to_file()
         text = "Successfully saved to {} at {}".format(
-            self.code_time.filename,
-            datetime.datetime.now().strftime("%H:%M:%S"))
+            self.code_time.filename, datetime.datetime.now().strftime("%H:%M:%S")
+        )
         try:
             self.code_time.to_nice_format()
         except PermissionError:
-            out_name_xls = os.path.splitext(
-                self.code_time.filename)[0] + "_fancy" + ".xlsx"
-            text = "ERROR: Please close Excel sheet open at {}".format(
-                out_name_xls)
+            out_name_xls = (
+                os.path.splitext(self.code_time.filename)[0] + "_fancy" + ".xlsx"
+            )
+            text = "ERROR: Please close Excel sheet open at {}".format(out_name_xls)
         self.info_text.setText(text)
 
     def save_quit(self):
@@ -197,8 +199,8 @@ class CodeTimeUI(DesignerUI):
         for key, val in self.code_time.time_dict.items():
             dt = datetime.timedelta(seconds=val)
             self.time_dict[key].setText(
-                strfdelta(
-                    dt, "{hours} hours, {minutes} minutes, {seconds} seconds"))
+                strfdelta(dt, "{hours} hours, {minutes} minutes, {seconds} seconds")
+            )
         self.time_text.setText("Total today " + self.code_time.get_total_time())
 
     def on_update_timer(self):
