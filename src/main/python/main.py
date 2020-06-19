@@ -216,10 +216,10 @@ class CodeTimeUI(DesignerUI):
         self.code_time.update(self.update_frequency_secs)
         self.update_times()
 
+
 def main():
     here = os.path.dirname(os.path.realpath(__file__))
-    ui_path = os.path.join(
-        here, "..", "resources", "base", "codetime.ui")
+    ui_path = os.path.join(here, "..", "resources", "base", "codetime.ui")
     ui = CodeTimeUI(ui_path)
     ui.start()
     sys.exit()
