@@ -2,21 +2,19 @@ import os
 import sys
 import datetime
 
-from fbs_runtime.application_context.PyQt5 import ApplicationContext
 from PyQt5 import uic
 from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QTimer
-import pkg_resources.py2_warn
 import openpyxl
 
-from code_time import CodeTime, strfdelta
+from .code_time import CodeTime, strfdelta
 
 
 class DesignerUI(object):
-    def __init__(self, design_name):
-        self.appctxt = ApplicationContext()
-        design_path = self.appctxt.get_resource(design_name)
+    def __init__(self, design_path):
         Form, Window = uic.loadUiType(design_path)
+        self.app = QApplication([])
         self.window = Window()
         self.ui = Form()
         self.ui.setupUi(self.window)
@@ -24,10 +22,10 @@ class DesignerUI(object):
 
     def start(self):
         self.window.show()
-        self.exit_code = self.appctxt.app.exec_()
+        self.app.exec_()
 
     def getWidgets(self):
-        return self.appctxt.app.allWidgets()
+        return self.app.allWidgets()
 
     def getWidgetNames(self):
         return [w.objectName() for w in self.getWidgets()]
@@ -78,10 +76,21 @@ class CodeTimeUI(DesignerUI):
         }
 
         self.info_text = self.ui.InfoText
+        f = self.info_text.font()
+        f.setPointSize(10)
+        self.info_text.setFont(f)
         self.file_select_text = self.ui.FileSelect
         self.date_text = self.ui.DateLine
         self.selected_text = self.ui.SelectedLine
         self.time_text = self.ui.TimeLine
+        f = self.time_text.font()
+        f.setPointSize(10)
+        self.time_text.setFont(f)
+
+        for key, val in self.time_dict.items():
+            f = self.time_dict[key].font()
+            f.setPointSize(10)
+            self.time_dict[key].setFont(f)
 
         self.objective_edit = self.ui.ObjectiveEdit
         self.summary_edit = self.ui.SummaryEdit
@@ -193,7 +202,7 @@ class CodeTimeUI(DesignerUI):
 
     def save_quit(self):
         self.save()
-        self.appctxt.app.quit()
+        self.app.quit()
 
     def update_times(self):
         for key, val in self.code_time.time_dict.items():
@@ -207,9 +216,14 @@ class CodeTimeUI(DesignerUI):
         self.code_time.update(self.update_frequency_secs)
         self.update_times()
 
+def main():
+    here = os.path.dirname(os.path.realpath(__file__))
+    ui_path = os.path.join(
+        here, "..", "resources", "base", "codetime.ui")
+    ui = CodeTimeUI(ui_path)
+    ui.start()
+    sys.exit()
+
 
 if __name__ == "__main__":
-    here = os.path.dirname(os.path.realpath(__file__))
-    ui = CodeTimeUI("codetime.ui")
-    ui.start()
-    sys.exit(ui.exit_code)
+    main()
