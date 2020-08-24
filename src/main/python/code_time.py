@@ -234,7 +234,7 @@ def main():
         if args.update != 0:
             code_time.add_time_mins(args.key, args.update)
         elif args.set != 1000:
-            code_time.time_dict[args.key] = args.set
+            code_time.time_dict[args.key] = (args.set * 60)
     elif args.key in code_time.meta_dict.keys():
         changed = True
         if args.text != "":
